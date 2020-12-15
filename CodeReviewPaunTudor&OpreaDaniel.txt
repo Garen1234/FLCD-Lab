@@ -1,0 +1,39 @@
+I can appreciate the effort to make this assignment in c++.  I find it rather challenging operating in this language.
+
+
+void concat (string a, string b) 
+
+- this is the concatenation function for first and follow. It is pretty complicated, I would recommend instead of using the global variable result to use a local one and returning. And also, u verify for each component in a every component in b. U could have used a SET and add all elements from A, and if a contains epsilon (space in ur case) add all from b. This would have been more efficient.
+
+void FIRST()
+
+fi and fz kinda hard to understand their meaning without suggestive names... Otherwise the algorithm seems clear, but some commentaries would have been better. 
+
+void Follow()
+
+- this has very nice names, very explicit. 
+For productions like S->BA where u put in Follow of A follow of S, I would say you could rewrite it easier by making sets and adding them in 2 for's, without having to check them.
+- the function looks pretty big, but it is explicit and yet again a set would have helped it look a little better.
+
+void createParseTable()
+
+-crystal clear, suggestive names, nice.
+
+bool checkSequence(string s)
+
+- if(true) ? - why ?
+- very nice function otherwise... Playing with & operand and recursive function, made this function pretty easy to write, easier than ours. (congrats)
+
+
+void printTree()
+
+-nothing to say, just your way of printing. 
+
+void printParseTable()
+
+-yet again just printing. Using java would have been easier for you I guess :D
+
+
+int main()
+
+-maybe the clearest function :)), easy to understand, but I would recommend in future to divide the output and input in another function, and so on, anyways great job. 
