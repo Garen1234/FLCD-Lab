@@ -1,4 +1,11 @@
 #include <bits/stdc++.h>
+#include <string>
+#include <vector>
+#include <map>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+
 
 using namespace std;
 
@@ -6,20 +13,21 @@ string alphabet;
 vector <string> NonTerminals;
 map <string, vector <string> > productions;
 string startingNonTerminal;
-map <string , vector < pair<string , int >  > > productionNumbers;
+map <string, vector < pair<string, int >  > > productionNumbers;
 
 map <string, vector <string> > Fi, Fj, Fz;
 
-map < string , map <string , vector < pair< string ,int > > > >parseTable;
+map < string, map <string, vector < pair< string, int > > > >parseTable;
 
 vector <string> result;
 // space is epsilon
 // concatenation of length 1 function
 
-string sequence , inputStack;
+
+string sequence, inputStack;
 int nodeCounter = 0;
 
-vector< pair < pair < int , string>  , pair < int , int > > > tree;
+vector< pair < pair < int, string>, pair < int, int > > > tree;
 
 
 
@@ -214,10 +222,10 @@ void FOLLOW() {
                         }
                     }
 
-                    if (production.second[position1][position2+1] != epsilon[0]) {
+                    if (production.second[position1][position2 + 1] != epsilon[0]) {
                         auto next = production.second[position1][position2 + 1];
                         string nextElement = string(1, next);
-                       //in productions like abc, in follow(b) we put first(c)
+                        //in productions like abc, in follow(b) we put first(c)
                         for (auto a : Fi[nextElement]) {
                             //search for epsilon
                             for (int index = 0; index < Fi[a].size(); index++)
@@ -236,7 +244,7 @@ void FOLLOW() {
                                             followSet[nonTerminal].push_back(value);
                                     }
                                 }
-                                else{
+                                else {
                                     values.clear();
                                     int terminal = true;
                                     for (int index = 0; index < NonTerminals.size(); index++) {
@@ -285,37 +293,37 @@ void createParseTable()
 
 
 
- for(auto nonTerminal : NonTerminals )
-    for(int i = 0 ; i < alphabet.size() ; ++i)
- {
-     // initialising the parse table
-     parseTable[ nonTerminal ] [  string(1, alphabet[i]) ];
- }
-
- for(auto nonTerminal : NonTerminals )
-    for(auto prod : productionNumbers[nonTerminal] )
- {
-     auto production = prod.first;
-        Fz.clear();
-        Fz = Fi;
-
-        Fz["rez"] = Fz[ string(1,production[0]) ];
-        // compute first of production
-     for( int i= 1 ; i < production.size() ; ++i)
-     {
-            concat("rez" , string(1, production[i]) );
-            Fz["rez"].clear();
-            Fz["rez"] = result;
-     }
-        // add to parse table
-     for(  auto symbol : Fz["rez"] )
-                if( symbol != " ")
-            parseTable[ nonTerminal ][ symbol ].push_back( { prod.first , prod.second} );
-        else {
-            for( auto e : followSet[nonTerminal] )
-            parseTable[nonTerminal][ e ].push_back( {prod.first, prod.second});
+    for (auto nonTerminal : NonTerminals)
+        for (int i = 0; i < alphabet.size(); ++i)
+        {
+            // initialising the parse table
+            parseTable[nonTerminal][string(1, alphabet[i])];
         }
- }
+
+    for (auto nonTerminal : NonTerminals)
+        for (auto prod : productionNumbers[nonTerminal])
+        {
+            auto production = prod.first;
+            Fz.clear();
+            Fz = Fi;
+
+            Fz["rez"] = Fz[string(1, production[0])];
+            // compute first of production
+            for (int i = 1; i < production.size(); ++i)
+            {
+                concat("rez", string(1, production[i]));
+                Fz["rez"].clear();
+                Fz["rez"] = result;
+            }
+            // add to parse table
+            for (auto symbol : Fz["rez"])
+                if (symbol != " ")
+                    parseTable[nonTerminal][symbol].push_back({ prod.first , prod.second });
+                else {
+                    for (auto e : followSet[nonTerminal])
+                        parseTable[nonTerminal][e].push_back({ prod.first, prod.second });
+                }
+        }
 
 
 }
@@ -323,24 +331,24 @@ void createParseTable()
 
 bool checkSequence(string s)
 {
-    if(inputStack == "")
+    if (inputStack == "")
         inputStack = " ";
 
-    if( true)
+    if (true)
     {
-         if( s == string(1,inputStack[0]))
-    {
-        inputStack.erase(0,1);
-        return true;
-    }
-    else if( parseTable[ s ][ string(1,inputStack[0]) ].size() > 0 )
+        if (s == string(1, inputStack[0]))
+        {
+            inputStack.erase(0, 1);
+            return true;
+        }
+        else if (parseTable[s][string(1, inputStack[0])].size() > 0)
         {
             bool res = true;
-           // cout << s <<" ->" << " " << parseTable[ s ][ string(1,inputStack[0]) ][0].first << "\n";
-            for(auto symbol : parseTable[ s ][ string(1,inputStack[0]) ][0].first  )
+            // cout << s <<" ->" << " " << parseTable[ s ][ string(1,inputStack[0]) ][0].first << "\n";
+            for (auto symbol : parseTable[s][string(1, inputStack[0])][0].first)
             {
-                res &= checkSequence( string(1,symbol) );
-                if( res == false)
+                res &= checkSequence(string(1, symbol));
+                if (res == false)
                 {
                     //cout << inputStack<< "\n";
                     return res;
@@ -350,7 +358,7 @@ bool checkSequence(string s)
             return res;
 
         }
-        else if(  s == " "  )
+        else if (s == " ")
             return true;
 
     }
@@ -358,49 +366,129 @@ bool checkSequence(string s)
     return false;
 }
 
-void printTree(string s ,int father , int sibling)
+void printTree(string s, int father, int sibling)
 {
+    const char separator = ' ';
+    const int width = 10;
+
     nodeCounter++;
 
     int currentCount = nodeCounter;
 
-    if(inputStack == "")
+    if (inputStack == "")
         inputStack = " ";
 
-    if( true)
+    if (true)
     {
-        if( s == " ")
-        cout << nodeCounter <<" epsilon " << father << " " << sibling <<"\n";
-        else  cout << nodeCounter <<" "<< s <<" " << father << " " << sibling <<"\n";
+        if (s == " "){
+            cout << left << setw(width) << setfill(separator) << nodeCounter;
+            cout << left << setw(width) << setfill(separator) << "epsilon";
+            cout << left << setw(width) << setfill(separator) << father;
+            cout << left << setw(width) << setfill(separator) << sibling;
+            cout << endl;
+        }
+            //cout << nodeCounter << " epsilon " << father << " " << sibling << "\n";
+        else {
+            cout << left << setw(width) << setfill(separator) << nodeCounter;
+            cout << left << setw(width) << setfill(separator) << s;
+            cout << left << setw(width) << setfill(separator) << father;
+            cout << left << setw(width) << setfill(separator) << sibling;
+            cout << endl;
+        }
+            //cout << nodeCounter << " " << s << " " << father << " " << sibling << "\n";
 
-         if( s == string(1,inputStack[0]))
-    {
-        inputStack.erase(0,1);
+        if (s == string(1, inputStack[0]))
+        {
+            inputStack.erase(0, 1);
 
-    }
-    else if( parseTable[ s ][ string(1,inputStack[0]) ].size() > 0 )
+        }
+        else if (parseTable[s][string(1, inputStack[0])].size() > 0)
         {
 
-                int currentSibling = -1 , before ;
-            for(auto symbol : parseTable[ s ][ string(1,inputStack[0]) ][0].first  )
-            {   before = nodeCounter + 1;
+            int currentSibling = -1, before;
+            for (auto symbol : parseTable[s][string(1, inputStack[0])][0].first)
+            {
+                before = nodeCounter + 1;
 
-                printTree(  string(1,symbol) , currentCount , currentSibling  );
+                printTree(string(1, symbol), currentCount, currentSibling);
 
                 currentSibling = before;
             }
 
 
         }
-        else if(  s == " "  )
-                {
+        else if (s == " ")
+        {
 
-                }
+        }
 
     }
 
 
 }
+
+
+void printParseTable(){
+    const char separator = ' ';
+    const int width = 10;
+
+    cout << left << setw(width) << setfill(separator) << " ";
+    for (auto i : alphabet) {
+        if (i == ' ')
+            cout << left << setw(width) << setfill(separator) << "$";
+        else
+            cout << left << setw(width) << setfill(separator) << i;
+    }
+    cout << endl;
+    cout << "------------------------------------------------------------------";
+    cout << endl;
+    for (auto nonTerminal : NonTerminals) {
+        cout << left << setw(width) << setfill(separator) << "  " + nonTerminal + "   |";
+
+        for (int i = 0; i < alphabet[i]; ++i)
+        {
+            bool written = false;
+            for (auto pairs : parseTable[nonTerminal][string(1, alphabet[i])]) {
+                cout << left << setw(width) << setfill(separator) << "(" + pairs.first + "," + to_string(pairs.second) + ")";
+                written = true;
+            }
+            if (written == false)
+                cout << left << setw(width) << setfill(separator) << " ";
+        }
+
+        cout << endl;
+        cout << "------------------------------------------------------------------";
+        cout << endl;
+    }
+    for (int i = 0; i < alphabet.size(); ++i) {
+        if (alphabet[i] == ' ') {
+            cout << left << setw(width) << setfill(separator) << "$";
+        }
+        else
+            cout << left << setw(width) << setfill(separator) << alphabet[i];
+        for (int j = 0; j < alphabet.size(); ++j) {
+            if (i == 0) {
+                if (j == 0)
+                    cout << left << setw(width) << setfill(separator) << "acc";
+                else
+                    cout << left << setw(width) << setfill(separator) << " ";
+            }
+            else {
+                if (j == i) {
+                    cout << left << setw(width) << setfill(separator) << "pop";
+                }
+                else
+                    cout << left << setw(width) << setfill(separator) << " ";
+            }
+        }
+        cout << endl;
+        cout << "------------------------------------------------------------------";
+        cout << endl;
+    }
+
+    cout << endl;
+}
+
 
 int main()
 {
@@ -408,7 +496,7 @@ int main()
     ifstream fin("g1.in");
     getline(fin, line);
 
-    while (line.find(" ") != -1){
+    while (line.find(" ") != -1) {
         NonTerminals.push_back(line.substr(0, line.find(" ")));
         line.erase(0, line.find(" ") + 1);
     }
@@ -431,9 +519,11 @@ int main()
         string NonTerminal = line.substr(0, line.find(" "));
         line.erase(0, line.find(" ") + 1);
         if (line != "epsilon")
-            {productions[NonTerminal].push_back(line);   productionNumbers[NonTerminal].push_back({line , o});   }
+        {
+            productions[NonTerminal].push_back(line);   productionNumbers[NonTerminal].push_back({ line , o });
+        }
         else {
-            {productions[NonTerminal].push_back(" "); productionNumbers[NonTerminal].push_back({ " " , o});  }
+            {productions[NonTerminal].push_back(" "); productionNumbers[NonTerminal].push_back({ " " , o });  }
         }
         cout << NonTerminal << " -> " << line << "\n";
 
@@ -442,7 +532,7 @@ int main()
 
     fin.close();
     fin.open("g2.in");
-    getline(fin,sequence);
+    getline(fin, sequence);
     inputStack = sequence;
     fin.close();
 
@@ -461,22 +551,22 @@ int main()
         cout << "\n";
     }
 
-     cout << "-------------------------\n";
+    cout << "-------------------------\n";
     cout << "First\n";
 
     for (int i = 0; i < NonTerminals.size(); ++i)
+    {
+        cout << NonTerminals[i] << " : ";
+        for (int j = 0; j < Fi[NonTerminals[i]].size(); ++j)
         {
-            cout << NonTerminals[i]  << " : ";
-            for (int j = 0; j < Fi[NonTerminals[i]].size(); ++j)
-            {
-                if (Fi[NonTerminals[i]][j] == " ")
-                    cout << "epsilon" << " ";
-                else
-                    cout << Fi[NonTerminals[i]][j] << " ";
-            }
-            cout << "\n";
+            if (Fi[NonTerminals[i]][j] == " ")
+                cout << "epsilon" << " ";
+            else
+                cout << Fi[NonTerminals[i]][j] << " ";
         }
         cout << "\n";
+    }
+    cout << "\n";
 
 
     FOLLOW();
@@ -503,39 +593,47 @@ int main()
     cout << "PARSE TABLE\n";
 
 
-    for(auto nonTerminal : NonTerminals)
-            {   cout << " ............\n";
-                cout << nonTerminal <<" :\n";
+    for (auto nonTerminal : NonTerminals)
+    {
+        cout << " ............\n";
+        cout << nonTerminal << " :\n";
 
-                for(int i = 0 ; i< alphabet[i]; ++i )
-                {
-                    if( i > 0)
-                        cout << alphabet[i];
-                    else cout << "epsilon";
+        for (int i = 0; i < alphabet[i]; ++i)
+        {
+            if (i > 0)
+                cout << alphabet[i];
+            else cout << "epsilon";
 
-                    cout << " : ";
-                    if( parseTable[nonTerminal][ string(1, alphabet[i]) ].size() > 1  )
-                        {isLL1 = false;   cout << "  too many ";   }
-
-                    for(auto pairs : parseTable[nonTerminal][ string(1, alphabet[i]) ]  )
-                        cout << "(" <<pairs.first <<"," << pairs.second <<")| ";
-                cout <<"\n";
-                }
+            cout << " : ";
+            if (parseTable[nonTerminal][string(1, alphabet[i])].size() > 1)
+            {
+                isLL1 = false;   cout << "  too many ";
             }
 
-    if( isLL1 )
-        {cout << " Grammar is LL1\n";
-
-            bool  isGood = checkSequence(startingNonTerminal);
-                cout << sequence << " is" << ( isGood == true ? " accepted\n" : " not accepted\n" );
-
-            inputStack = sequence;
-            cout << " -- Parse tree of sequence ( father/sibling table ) --\n";
-            cout << " counter / node / father / sibling\n";
-            /// father / sibling table
-            printTree(startingNonTerminal , -1 , -1);
-
+            for (auto pairs : parseTable[nonTerminal][string(1, alphabet[i])])
+                cout << "(" << pairs.first << "," << pairs.second << ")| ";
+            cout << "\n";
         }
+    }
+
+    //print parse table in table format
+    printParseTable();
+
+    if (isLL1)
+    {
+        cout << " Grammar is LL1\n";
+
+        bool  isGood = checkSequence(startingNonTerminal);
+        cout << sequence << " is" << (isGood == true ? " accepted\n" : " not accepted\n");
+
+        inputStack = sequence;
+        cout << " -- Parse tree of sequence ( father/sibling table ) --\n";
+        cout << "counter  /  node  /  father  /  sibling\n";
+        /// father / sibling table
+        if(isGood)
+        printTree(startingNonTerminal, -1, -1);
+
+    }
     else cout << " Grammar not LL1";
 
 
